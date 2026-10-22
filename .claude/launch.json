@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "analiz-sitesi",
-      "runtimeExecutable": ".venv/bin/python",
-      "runtimeArgs": ["site.py", "--acma"],
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["run", "-c", "Release", "--", "site", "--acma"],
       "port": 8080
     }
   ]

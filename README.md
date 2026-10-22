@@ -13,7 +13,7 @@ Elo'ya göre yumuşatma yok: hamleler motor gözüyle değerlendirilir.
 
 Analizi [MaiEngineV3](https://github.com/Justmaii/MaiEngineV3) yapıyor; onu bu deponun
 **yanındaki klasöre** indirip derlemek gerekiyor. Gerekenler: `git`, C++20 derleyici
-(macOS'ta `xcode-select --install`, Linux'ta `g++` / `clang` ve `make`) ve Python 3.
+(macOS'ta `xcode-select --install`, Linux'ta `g++` / `clang` ve `make`) ve [.NET 10 SDK](https://dotnet.microsoft.com/download).
 
 ```sh
 # 1. MaiEngine'i indir, derle ve ağ dosyasını koy (98 MB, Stockfish 19 NNUE ağı)
@@ -24,11 +24,10 @@ curl -LO https://tests.stockfishchess.org/api/nn/nn-1a298aa575a0.nnue
 ./maiengine bench        # hatasız düğüm sayısı yazmalı
 cd ..
 
-# 2. MaiAnaliz'i indir ve Python ortamını kur
+# 2. MaiAnaliz'i indir ve derle (.NET 10 SDK gerekli: https://dotnet.microsoft.com/download)
 git clone https://github.com/Justmaii/MaiAnaliz.git
 cd MaiAnaliz
-python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
+dotnet build -c Release
 ```
 
 Klasör düzeni şöyle olmalı:
@@ -46,8 +45,8 @@ Motor başka bir yerdeyse `MAIENGINE=/yol/maiengine` ortam değişkeni ya da `--
 ## Kullanım
 
 ```sh
-.venv/bin/python site.py              # site: http://localhost:8080 (tarayıcı kendiliğinden açılır)
-.venv/bin/python analiz.py oyun.pgn   # komut satırı: oyun.analiz.html
+dotnet run -c Release                       # site: http://localhost:8080 (tarayıcı kendiliğinden açılır)
+dotnet run -c Release -- analiz oyun.pgn    # komut satırı: oyun.analiz.html
 ```
 
 Sitede PGN'i sürükleyip bırak ya da yapıştır (chess.com'da oyun → Paylaş → PGN).
@@ -58,7 +57,7 @@ Raporlar `analizler/` klasörüne de kaydedilir.
 
 Analiz derinliği: Hızlı (~0,4 sn/hamle), Normal (~1 sn/hamle), Derin (~3 sn/hamle).
 Komut satırında `--sure`, `--derinlik`, `--threads`, `--hash`, `--kitapsiz` seçenekleri var
-(`.venv/bin/python analiz.py -h`).
+(`dotnet run -c Release -- yardim`).
 
 ## Sınıflar nasıl belirleniyor
 
@@ -79,6 +78,21 @@ oynanan hamlenin kazanma olasılığı karşılaştırılır (Lichess'in kazanma
 Doğruluk, Lichess'in hamle doğruluğu formülüyle hesaplanır (Kitap ve Zorunlu hamleler hariç).
 chess.com'un CAPS sistemi Elo'ya göre yumuşattığı için yüzdeler ve hata sayıları farklı çıkabilir.
 
+## Proje yapısı
+
+C# / .NET 10, ASP.NET Core minimal API. Dış paket yok.
+
+```
+Satranc/   tahta, yasal hamle üretimi, SAN, PGN okuma, Polyglot kitap
+Analiz/    UCI motor istemcisi, hamle sınıflandırması ve doğruluk
+Rapor/     HTML rapor üretimi
+Site/      yerel analiz sitesi
+Sablonlar/ rapor ve ana sayfa HTML'i, taş görselleri (gömülü kaynak)
+```
+
+Hamle üretimi, MaiEngineV3'ün perft takımıyla doğrulanır (her hamlenin SAN'ı da yazılıp geri okunur):
+`dotnet run -c Release -- perft ../MaiEngineV3/tools/perft_random.epd`
+
 ## Lisans
 
-GPLv3 (bkz. `LICENSE`). Taş görselleri [python-chess](https://github.com/niklasf/python-chess) üzerinden.
+GPLv3 (bkz. `LICENSE`). Taş görselleri Colin M.L. Burnett'in "cburnett" seti (GPLv2+, python-chess dağıtımındaki SVG'ler).

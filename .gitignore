@@ -1,6 +1,9 @@
-.venv/
-__pycache__/
+bin/
+obj/
 analizler/
 book.bin
 *.analiz.html
 .DS_Store
+.vs/
+.idea/
+*.user

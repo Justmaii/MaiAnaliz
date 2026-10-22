@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+analizler/
+book.bin
+*.analiz.html
+.DS_Store

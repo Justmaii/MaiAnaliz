@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "analiz-sitesi",
+      "runtimeExecutable": ".venv/bin/python",
+      "runtimeArgs": ["site.py", "--acma"],
+      "port": 8080
+    }
+  ]
+}
